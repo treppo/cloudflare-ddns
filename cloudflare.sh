@@ -8,7 +8,6 @@
 ip=$(curl -s http://ipv4.icanhazip.com)
 ip_file="log/ip.txt"
 id_file="log/cloudflare.ids"
-log_file="log/cloudflare.log"
 
 # Keep files in the same folder when run from cron
 current="$(pwd)"
@@ -16,7 +15,6 @@ cd "$(dirname "$(readlink -f "$0")")"
 
 log() {
     if [ "$1" ]; then
-        echo -e "[$(date)] - $1" >> $log_file
 	echo -e $1
     fi
 }
