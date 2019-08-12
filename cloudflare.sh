@@ -6,9 +6,9 @@
 
 # Don't touch these
 ip=$(curl -s http://ipv4.icanhazip.com)
-ip_file="ip.txt"
-id_file="cloudflare.ids"
-log_file="cloudflare.log"
+ip_file="log/ip.txt"
+id_file="log/cloudflare.ids"
+log_file="log/cloudflare.log"
 
 # Keep files in the same folder when run from cron
 current="$(pwd)"
@@ -40,14 +40,14 @@ else
 	    -H "X-Auth-Key: $API_KEY" \
 	    -H "Content-Type: application/json")
     # If not successful, errors out
-    if [[ $(jq <<<"$zone_response" -r '.success') != "true" ]]; then
-        messages=$(jq <<<"$zone_response" -r '[.errors[] | .message] |join(" - ")')
+    if [[ $(echo $zone_response | jq -r '.success') != "true" ]]; then
+        messages=$(echo $zone_response | jq -r '[.errors[] | .message] |join(" - ")')
         echo >&2 "Error: $messages"
         exit 1
     fi
 
     # Selects the zone id
-    zone_identifier=$(jq <<<"$zone_response" -r ".result[0].id")
+    zone_identifier=$(echo $zone_response | jq -r ".result[0].id")
 
     # Tries to fetch the record of the host
     dns_record_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zone_identifier/dns_records?name=$RECORD_NAME" \
@@ -55,13 +55,13 @@ else
         -H "X-Auth-Key: $API_KEY" \
         -H "Content-Type: application/json")
 
-    if [[ $(jq <<<"$dns_record_response" -r '.success') != "true" ]]; then
-        messages=$(jq <<<"$dns_record_response" -r '[.errors[] | .message] |join(" - ")')
+    if [[ $(echo $dns_record_response | jq -r '.success') != "true" ]]; then
+        messages=$(echo $dns_record_response | jq -r '[.errors[] | .message] |join(" - ")')
         echo >&2 "Error: $messages"
         exit 1
     fi
 
-    record_identifier=$(jq <<<"$dns_record_response" -r ".result[] | select(.type ==\"A\") |.id")
+    record_identifier=$(echo $dns_record_response | jq -r ".result[] | select(.type ==\"A\") |.id")
 
     echo "$zone_identifier" > $id_file
     echo "$record_identifier" >> $id_file
