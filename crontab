@@ -1,0 +1,1 @@
+*/5 * * * * /app/dynamic-dns/cloudflare.sh
