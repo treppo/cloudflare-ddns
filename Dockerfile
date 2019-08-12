@@ -1,4 +1,4 @@
-FROM alpine:3.10.1
+FROM arm32v7/alpine:3.10.1
 
 COPY crontab /var/spool/cron/crontabs/root
 
