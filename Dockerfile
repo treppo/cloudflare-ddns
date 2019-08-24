@@ -13,4 +13,5 @@ RUN apk add --update --no-cache jq curl
 
 WORKDIR /app/dynamic-dns
 
-CMD ./cloudflare.sh
+CMD ./cloudflare.sh \
+    && crond -f
