@@ -2,10 +2,11 @@
 
 set -e
 
-sed -i '' 's/FROM arm32v7\/alpine/FROM alpine/' Dockerfile
-docker build --tag treppo/cloudflare-ddns .
+docker build \
+  --build-arg image=alpine:3.10 \
+  --tag treppo/cloudflare-ddns \
+  "$PWD"
 docker run \
   --env-file ddns.env \
   -v "$PWD"/log:/app/dynamic-dns/log \
   treppo/cloudflare-ddns
-sed -i '' 's/FROM alpine/FROM arm32v7\/alpine/' Dockerfile

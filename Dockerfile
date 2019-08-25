@@ -1,6 +1,6 @@
-FROM arm32v7/alpine:3.10.1
+ARG image=arm32v7/alpine:3.10
 
-COPY crontab /var/spool/cron/crontabs/root
+FROM $image
 
 COPY cloudflare.sh /app/dynamic-dns/cloudflare.sh
 
