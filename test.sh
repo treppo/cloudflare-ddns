@@ -8,5 +8,5 @@ docker build \
   "$PWD"
 docker run \
   --env-file ddns.env \
-  -v "$PWD"/log:/app/dynamic-dns/log \
+  --volume "$PWD"/log:/var/cache/dynamic-dns \
   treppo/cloudflare-ddns

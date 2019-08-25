@@ -6,8 +6,8 @@ set -e
 # Original non-RPi article: https://phillymesh.net/2016/02/23/setting-up-dynamic-dns-for-your-registered-domain-through-cloudflare/
 
 ip=$(curl -s http://ipv4.icanhazip.com)
-ip_file="log/ip.txt"
-id_file="log/cloudflare-ids.txt"
+ip_file="/var/cache/dynamic-dns/ip.txt"
+id_file="/var/cache/dynamic-dns/cloudflare-ids.txt"
 
 # Keep files in the same folder when run from cron
 cd "$(dirname "$(readlink -f "$0")")"

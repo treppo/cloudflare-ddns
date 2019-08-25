@@ -2,7 +2,11 @@ ARG image=arm32v7/alpine:3.10
 
 FROM $image
 
-COPY cloudflare.sh /app/dynamic-dns/cloudflare.sh
+RUN mkdir /etc/periodic/5min && \
+    echo "*/5	*	*	*	*	run-parts /etc/periodic/5min" >> /etc/crontabs/root && \
+    cat /etc/crontabs/root
+
+COPY cloudflare.sh /etc/periodic/5min/dynamic-dns
 
 ENV API_KEY= \
     AUTH_EMAIL= \
@@ -11,7 +15,5 @@ ENV API_KEY= \
 
 RUN apk add --update --no-cache jq curl
 
-WORKDIR /app/dynamic-dns
-
-CMD ./cloudflare.sh \
+CMD /etc/periodic/5min/dynamic-dns \
     && crond -f
