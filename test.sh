@@ -7,7 +7,7 @@ sed -i '' 's/server_name cloud.treppo.org;/server_name localhost;/' nginx/conf.d
 
 docker build \
   --build-arg image=alpine:3.10 \
-  --tag treppo/cloudflare-ddns \
+  --tag treppo/nginx-cloudflare-ddns:latest \
   "$PWD"
 docker run \
   --read-only \
@@ -17,4 +17,4 @@ docker run \
   --volume "$PWD"/cache:/var/cache/nginx \
   --volume "$PWD"/html:/var/www/html/:ro \
   --publish 8080:8080 \
-  treppo/cloudflare-ddns
+  treppo/nginx-cloudflare-ddns:latest
