@@ -10,8 +10,11 @@ docker build \
   --tag treppo/cloudflare-ddns \
   "$PWD"
 docker run \
+  --read-only \
   --env-file ddns.env \
-  --volume "$PWD"/log:/var/cache/dynamic-dns \
+  --volume "$PWD"/cache/nginx:/var/tmp/nginx \
+  --volume "$PWD"/cache:/var/cache/dynamic-dns \
+  --volume "$PWD"/cache:/var/cache/nginx \
   --volume "$PWD"/html:/var/www/html/:ro \
   --publish 8080:8080 \
   treppo/cloudflare-ddns

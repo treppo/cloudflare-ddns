@@ -1,4 +1,4 @@
-log
+cache
 *.env
 .idea
 nginx/conf.d/localhost.conf
