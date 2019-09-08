@@ -1,11 +1,19 @@
 ARG image=arm32v7/alpine:3.10
 
-FROM $image
+FROM golang:alpine AS build
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+COPY ./go-crond /go/src/go-crond
+WORKDIR /go/src/go-crond
 
-# run ip update every 5 minutes
-RUN mkdir /etc/periodic/5min && \
-    echo "*/5	*	*	*	*	run-parts /etc/periodic/5min" >> /etc/crontabs/root && \
-    cat /etc/crontabs/root
+RUN apk --no-cache add git \
+    && go get \
+    && go build \
+    && chmod +x go-crond \
+    && ./go-crond --version
+
+
+FROM $image
 
 # define environment variables needed for ip update script
 ENV API_KEY= \
@@ -18,7 +26,6 @@ RUN addgroup --system --gid 666 web \
     && adduser --system --disabled-password --no-create-home --uid 666 --home /var/cache/web --shell /sbin/nologin --ingroup web --gecos web web \
     && apk add --update --no-cache jq curl nginx
 
-COPY cloudflare.sh /etc/periodic/5min/dynamic-dns
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/conf.d/*.conf /etc/nginx/conf.d/
 
@@ -26,10 +33,15 @@ COPY nginx/conf.d/*.conf /etc/nginx/conf.d/
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
 
+# run ip update every minute
+COPY --from=build /go/src/go-crond/go-crond /usr/local/bin
+COPY cloudflare.sh /usr/local/bin
+COPY crontab /etc/crontabs/web
+RUN rm /etc/crontabs/root
+
 EXPOSE 8080
 
 USER 666
 
-CMD /etc/periodic/5min/dynamic-dns \
-    && nginx \
-    && crond -f
+CMD nginx \
+    && go-crond --default-user=web --allow-unprivileged

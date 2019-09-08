@@ -1,0 +1,3 @@
+[submodule "go-crond"]
+	path = go-crond
+	url = https://github.com/webdevops/go-crond
